@@ -23,21 +23,40 @@ func (r *FetchRecord) String () string {
 func fetchMenu() {
 	fmt.Print("Make a GET request?\n\n")
 
-	url := "https://www.google.com"
-	rec := makeFetch(url)
+	urls := []string{
+		"https://www.google.com",
+		"https://www.yahoo.com",
+		"https://www.bing.com",
+		"https://www.codecademy.com",
+	}
 
-	fmt.Println("** Fetched **")
-	fmt.Println(rec)
+	// setup buffered channel
+	resultChan := make(chan *FetchRecord, len(urls))
+	defer close(resultChan)
+
+	// spawn go routines
+	for i := range urls {
+		url := urls[i]
+		go makeFetch(url, resultChan)
+	}
+
+	// express results
+	for i := 0; i < len(urls); i++ {
+		rec := <-resultChan
+		fmt.Println("** Fetched **")
+		fmt.Println(rec)
+	}
 }
 
-func makeFetch (url string) *FetchRecord {
+func makeFetch (url string, resultChan chan *FetchRecord) {
 	// init new record
 	nRec := &FetchRecord{Url: url}
 
+	// begin timer
 	start := time.Now()
-
+	// make request
 	resp, err := http.Get(url)
-
+	// stop timer
 	elapsed := time.Since(start)
 
 	// calc and convert elapsed time
@@ -52,6 +71,6 @@ func makeFetch (url string) *FetchRecord {
 		nRec.Successful = true
 	}
 
-	return nRec
+	resultChan <- nRec
 }
 
