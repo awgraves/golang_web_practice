@@ -8,8 +8,7 @@ import (
 
 func serverMenu () {
 	fmt.Print("Please enter a port # for server to run: ")
-	var port string
-	fmt.Scanln(&port)
+	port := getUserInput()
 	portArg := strings.TrimSpace(port)
 
 	startWeb(portArg)
@@ -22,10 +21,7 @@ func startWeb (port string) {
 	fmt.Printf("Attempting to start webserver on port %v...\n", port)
 	http.HandleFunc("/", indexFunc)
 
-	// prepend the colon
-	portArg := ":" + port
-
-	err := http.ListenAndServe(portArg, nil)
+	err := http.ListenAndServe(fmt.Sprintf(":%v", port), nil)
 
 	if err != nil {
 		fmt.Printf("\n%v\n\n", err)
