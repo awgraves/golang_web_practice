@@ -31,7 +31,7 @@ func mainOptions () {
 	switch choice {
 	case "S":
 		serverMenu()
-		mainOptions() // if exited server menu, regive options
+		mainOptions() // if exited sub-menu, regive main options
 	case "F":
 		fetchMenu()
 		mainOptions()
