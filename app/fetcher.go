@@ -3,6 +3,8 @@ package main
 import (
 	"fmt"
 	"net/http"
+	"os"
+	"strings"
 	"time"
 )
 
@@ -40,12 +42,17 @@ func fetchMenu() {
 		go makeFetch(url, resultChan)
 	}
 
-	// express results
+	// express results & save to array
+	var results []*FetchRecord
+
 	for i := 0; i < len(urls); i++ {
 		rec := <-resultChan
 		fmt.Println("** Fetched **")
 		fmt.Println(rec)
+		results = append(results, rec)
 	}
+
+	exportResultToFile(results)
 }
 
 func makeFetch (url string, resultChan chan *FetchRecord) {
@@ -74,3 +81,22 @@ func makeFetch (url string, resultChan chan *FetchRecord) {
 	resultChan <- nRec
 }
 
+func exportResultToFile (recs []*FetchRecord) {
+	fmt.Println("Saving results to fetch_results.txt...")
+
+	// create the file
+	f, _ := os.Create("fetch_results.txt")
+	defer f.Close()
+
+	// give header to file
+	loc, _ := time.LoadLocation("America/New_York")
+	dt := time.Now().In(loc).Format("Mon Jan 2, 2006 3:04:05 PM")
+	
+	h := fmt.Sprintf("** Output of program %v **\n", dt)
+	stars := fmt.Sprintln(strings.Repeat("*", len(h) - 1))  // last char is new line char, so -1
+	fmt.Fprint(f, stars, h, stars)
+
+	for _, v := range recs {
+		fmt.Fprint(f, "\n", v)
+	}
+}
