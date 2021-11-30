@@ -7,11 +7,13 @@ import (
 
 func main () {
 	fmt.Println("Hello World")
-	takeOptions()
+	mainOptions()
 }
 
-func takeOptions () {
-	fmt.Print("Start web server? (Y/N): ")
+func mainOptions () {
+	fmt.Println("S - to start web server")
+	fmt.Println("F - to fetch web responses concurrently")
+	fmt.Print(": ")
 
 	var choice string
 	fmt.Scanln(&choice)
@@ -19,13 +21,13 @@ func takeOptions () {
 	choice = strings.ToUpper(choice)
 
 	switch choice {
-	case "Y":
+	case "S":
 		serverMenu()
-		takeOptions() // if exited server menu, regive options
-	case "N":
-		fmt.Println("You chose not to start.")
+		mainOptions() // if exited server menu, regive options
+	case "F":
+		fmt.Println("Would redirect to concurrent fetch")
 	default:
 		fmt.Println("Invalid input")
-		takeOptions()
+		mainOptions()
 	}
 }
